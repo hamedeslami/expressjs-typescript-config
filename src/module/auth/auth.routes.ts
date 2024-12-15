@@ -1,7 +1,7 @@
 import { Router, Request, Response, NextFunction } from "express";
 import AuthController from "./auth.controller";
 import { LoginValidator, RefreshValidator } from "./auth.validator";
-import Authorization from "../../common/middleware/authorization.middleware";
+import Authentication from "../../common/middleware/authentication.middleware";
 
 const router = Router();
 
