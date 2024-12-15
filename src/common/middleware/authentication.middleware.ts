@@ -6,7 +6,11 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-export default async function Authorization(req: Request, res: Response, next: NextFunction) {
+export interface AuthenticationRequest extends Request {
+    user?: object
+}
+
+export default async function Authentication(req: AuthenticationRequest, res: Response, next: NextFunction) {
     try {
         const token = req.headers.authorization;
         if (!token) return next(createHttpError.Unauthorized('You should login!'));
@@ -26,7 +30,7 @@ export default async function Authorization(req: Request, res: Response, next: N
         if (verifyToken && typeof verifyToken === 'object' && 'mobile' in verifyToken) {
             const user = await UserModel.findOne({ where: { mobile: verifyToken.mobile }, raw: true });
             if (!user) return next(createHttpError.Unauthorized('Token not valid! 3'));
-            // req.user = user;
+            req.user = user;
             return next();
         }
         return next(createHttpError.Unauthorized('Token not valid! 4'));
