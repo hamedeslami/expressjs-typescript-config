@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from "express";
 import AuthServices from "./auth.services";
 import { validationResult } from "express-validator";
 import AuthMessage from "./auth.message";
+import { formattedErrors } from "../../utils/errorsFormatter";
+import { sendResponse } from "../../utils/responseFormatter";
 
 class AuthController {
   #service;
@@ -15,24 +17,22 @@ class AuthController {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         const allErrors = errors?.mapped();
-        return res.status(400).json({
-          statusCode: 400,
-          message: AuthMessage.fieldValidation,
-          data: allErrors,
-        });
+        const mapedError = formattedErrors(allErrors);
+
+        return sendResponse(
+          res,
+          401,
+          AuthMessage.fieldValidation,
+          "AUTHORIZED_ERROR",
+          []
+        );
       }
 
       const result = await this.#service.login(
         req.body.username,
         req.body.password
       );
-      if (result) {
-        res.status(200).json({
-          statusCode: 200,
-          message: AuthMessage.loginSuccess,
-          data: result,
-        });
-      }
+      result && sendResponse(res, 200, AuthMessage.loginSuccess, "", result);
     } catch (error) {
       next(error);
     }
@@ -67,24 +67,28 @@ class AuthController {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         const allErrors = errors?.mapped();
-        return res.status(400).json({
-          statusCode: 400,
-          message: AuthMessage.fieldValidation,
-          data: allErrors,
-        });
+        const mapedError = formattedErrors(allErrors);
+        return sendResponse(
+          res,
+          400,
+          AuthMessage.fieldValidation,
+          "VALIDATION_ERROR",
+          mapedError
+        );
       }
 
       const refreshToken = req.body.refreshToken;
 
       const result = await this.#service.verifyRefreshToken(refreshToken);
 
-      if (result) {
-        res.status(200).json({
-          statusCode: 200,
-          message: AuthMessage.createRefreshTokenSuccess,
-          data: result,
-        });
-      }
+      result &&
+        sendResponse(
+          res,
+          200,
+          AuthMessage.createRefreshTokenSuccess,
+          "",
+          result
+        );
     } catch (error) {
       next(error);
     }

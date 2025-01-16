@@ -1,4 +1,4 @@
-import { hashPassword } from "../../utils/password";
+import { hashPassword } from "../../utils/passwordFormatter";
 import { UserModel } from "./user.model";
 import createHttpError from "http-errors";
 import UserMessage from "./user.message";

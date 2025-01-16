@@ -1,5 +1,5 @@
 import createHttpError from "http-errors";
-import { verifyPassword } from "../../utils/password";
+import { verifyPassword } from "../../utils/passwordFormatter";
 import { UserModel } from "../user/user.model";
 import AuthMessage from "./auth.message";
 import jwt from "jsonwebtoken";

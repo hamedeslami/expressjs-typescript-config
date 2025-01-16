@@ -31,8 +31,8 @@ async function main(): Promise<void>{
     const port = parseInt(process.env.PORT || '3000', 10);
 
     // Use Helmet for security
-    // app.use(helmet());
-    // app.disable('x-powered-by');
+    app.use(helmet());
+    app.disable('x-powered-by');
 
     // Configure Swagger
     SwaggerConfig(app);
@@ -53,7 +53,7 @@ async function main(): Promise<void>{
 
     // Start the server
     app.listen(port, () => {
-        console.log(`Server is running at http://localhost:${port}`);
+        console.log(`Server is running at http://127.0.0.1:${port}`);
     });
 }
 

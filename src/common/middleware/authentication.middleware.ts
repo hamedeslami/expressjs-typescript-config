@@ -1,7 +1,7 @@
 import { Application, Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import createHttpError from 'http-errors';
-import { UserModel } from '../../module/user/user.model';
+import { UserModel } from '../../modules/user/user.model';
 import dotenv from 'dotenv';
 
 dotenv.config();
