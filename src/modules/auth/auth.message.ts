@@ -7,7 +7,7 @@ const AuthMessage: { [key: string]: string } = Object.freeze({
     tokenField: "create token field!",
     refreshTokenField: "create refresh token field!",
     privateKeyNotSet: "Private key not set",
-    createRefreshTokenSuccess: "create refresh token successfully."
+    createRefreshTokenSuccess: "create fresh token successfully."
 });
 
 export default AuthMessage;

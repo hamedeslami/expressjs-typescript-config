@@ -45,13 +45,13 @@ class AuthServices {
                         expiresIn: 600,
                     };
                 }
-    
+
                 throw new createHttpError.Unauthorized(AuthMessage.tokenField);
             }
         }
         throw new createHttpError.Unauthorized(AuthMessage.loginField);
     }
-    
+
 
     async sendOTP(phoneNumber: string) {
         try {
@@ -67,7 +67,7 @@ class AuthServices {
         }
     }
 
-    async checkOTP(phoneNumber:string , code: string) {
+    async checkOTP(phoneNumber: string, code: string) {
         try {
             // Example logic for checking OTP
             // Ensure phoneNumber and code are valid
@@ -96,11 +96,11 @@ class AuthServices {
         if (!PrivateKey) throw new createHttpError.InternalServerError(AuthMessage.privateKeyNotSet);
 
         const token = jwt.sign(payload, PrivateKey, options);
-        if(token) return token;
+        if (token) return token;
         throw new createHttpError.InternalServerError(AuthMessage.tokenField);
     }
 
-    async #createRefreshToken(payload: Object){
+    async #createRefreshToken(payload: Object) {
         const PrivateKey = process.env.API_REFRESH_PRIVATE_KEY;
         const options = {
             expiresIn: 60 * 60
@@ -109,35 +109,37 @@ class AuthServices {
 
 
         const refreshToken = jwt.sign(payload, PrivateKey, options);
-        if(refreshToken) return refreshToken;
+        if (refreshToken) return refreshToken;
         throw new createHttpError.InternalServerError(AuthMessage.refreshTokenField);
     }
 
     async verifyRefreshToken(refreshToken: string) {
-        const PrivateRefreshKey = process.env.API_REFRESH_PRIVATE_KEY;
-        if(!PrivateRefreshKey) throw new createHttpError.InternalServerError(AuthMessage.privateKeyNotSet);
+        try {
+            const PrivateRefreshKey = process.env.API_REFRESH_PRIVATE_KEY;
+            if (!PrivateRefreshKey) throw new createHttpError.InternalServerError(AuthMessage.privateKeyNotSet);
+            const payload = jwt.verify(refreshToken, PrivateRefreshKey);
+            if (payload && typeof payload === 'object' && 'mobile' in payload) {
+                const user = (await this.model.findOne({ where: { mobile: payload.mobile }, raw: true })) as UserType | null;
+                if (!user) throw new createHttpError.Unauthorized(AuthMessage.userNotFound);
 
-        const payload = jwt.verify(refreshToken, PrivateRefreshKey);            
-        if(payload && typeof payload === 'object' && 'mobile' in payload){
-            const user = (await this.model.findOne({ where: { mobile: payload.mobile }, raw: true })) as UserType | null;
-            if(!user) throw new createHttpError.Unauthorized(AuthMessage.userNotFound);
-
-            const data: UserType = {
-                firstname: user.firstname,
-                lastname: user.lastname,
-                mobile: user.mobile
-            };
-
-            const newToken = this.#createToken(data);
-            if(newToken) {
-                return {
-                    accessToken: newToken,
-                    type: "Bearer",
-                    expiresIn: 600,
+                const data: UserType = {
+                    firstname: user.firstname,
+                    lastname: user.lastname,
+                    mobile: user.mobile
                 };
+
+                const newToken = this.#createToken(data);
+                if (newToken) {
+                    return {
+                        accessToken: newToken,
+                        type: "Bearer",
+                        expiresIn: 600,
+                    };
+                }
             }
+        } catch (error) {
+            throw new createHttpError.Unauthorized(AuthMessage.refreshTokenField);
         }
-        throw new createHttpError.Unauthorized(AuthMessage.refreshTokenField);
     }
 }
 
