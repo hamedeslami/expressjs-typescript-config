@@ -20,7 +20,9 @@ async function main(): Promise<void>{
     // app.disable('x-powered-by');
 
     // Configure Swagger
-    SwaggerConfig(app);
+    if(process.env.NODE_ENV === "development"){
+        SwaggerConfig(app);
+    }
 
     // Middleware for JSON and URL-encoded data
     app.use(express.json());
