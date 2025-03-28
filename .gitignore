@@ -1,0 +1,17 @@
+# npm
+node_modules
+package-lock.json
+*.log
+*.gz
+
+# ide
+.idea
+
+# os
+.DS_Store
+
+# env
+.env
+
+# ignore additional files using core.excludesFile
+# https://git-scm.com/docs/gitignore
